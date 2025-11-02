@@ -1,12 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Page Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Extracurricular Achievement Platform</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="container">
+        <div class="login-container">
+            <div class="header">
+                <h1>🏆 Student Achievement Platform</h1>
+                <p>Track and manage extracurricular achievements</p>
+            </div>
 
-<h1>HELLO KLU</h1>
-<p>About KLU.</p>
+            <div class="role-selection">
+                <h2>Select Your Role</h2>
+                <div class="role-cards">
+                    <div class="role-card" onclick="selectRole('admin')">
+                        <div class="role-icon">👨‍💼</div>
+                        <h3>Admin</h3>
+                        <p>Manage achievements, update records, and generate reports</p>
+                        <button class="btn btn-primary">Access Admin Panel</button>
+                    </div>
+                    <div class="role-card" onclick="selectRole('student')">
+                        <div class="role-icon">👨‍🎓</div>
+                        <h3>Student</h3>
+                        <p>View your achievements and track participation</p>
+                        <button class="btn btn-secondary">View My Achievements</button>
+                    </div>
+                </div>
+            </div>
 
+            <div id="studentLoginForm" class="login-form" style="display: none;">
+                <h2>Student Login</h2>
+                <form onsubmit="studentLogin(event)">
+                    <div class="form-group">
+                        <label for="studentId">Student ID</label>
+                        <input type="text" id="studentId" placeholder="Enter your student ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentName">Full Name</label>
+                        <input type="text" id="studentName" placeholder="Enter your full name" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    <button type="button" class="btn btn-secondary btn-block" onclick="backToRoleSelection()">Back</button>
+                </form>
+            </div>
+
+            <div id="adminLoginForm" class="login-form" style="display: none;">
+                <h2>Admin Login</h2>
+                <form onsubmit="adminLogin(event)">
+                    <div class="form-group">
+                        <label for="adminUsername">Username</label>
+                        <input type="text" id="adminUsername" placeholder="Enter admin username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password</label>
+                        <input type="password" id="adminPassword" placeholder="Enter password" required>
+                    </div>
+                    <p class="hint">Default credentials: admin / admin123</p>
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    <button type="button" class="btn btn-secondary btn-block" onclick="backToRoleSelection()">Back</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        function selectRole(role) {
+            document.querySelector('.role-selection').style.display = 'none';
+            if (role === 'admin') {
+                document.getElementById('adminLoginForm').style.display = 'block';
+            } else {
+                document.getElementById('studentLoginForm').style.display = 'block';
+            }
+        }
+
+        function backToRoleSelection() {
+            document.querySelector('.role-selection').style.display = 'block';
+            document.getElementById('adminLoginForm').style.display = 'none';
+            document.getElementById('studentLoginForm').style.display = 'none';
+        }
+
+        function adminLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (username === 'admin' && password === 'admin123') {
+                localStorage.setItem('userRole', 'admin');
+                window.location.href = 'admin.html';
+            } else {
+                alert('Invalid credentials. Please try again.\nDefault: admin / admin123');
+            }
+        }
+
+        function studentLogin(event) {
+            event.preventDefault();
+            const studentId = document.getElementById('studentId').value;
+            const studentName = document.getElementById('studentName').value;
+
+            localStorage.setItem('userRole', 'student');
+            localStorage.setItem('currentStudentId', studentId);
+            localStorage.setItem('currentStudentName', studentName);
+
+            // Ensure student exists in the system
+            const students = DataManager.getStudents();
+            if (!students.find(s => s.id === studentId)) {
+                DataManager.addStudent({
+                    id: studentId,
+                    name: studentName,
+                    email: `${studentId}@student.edu`,
+                    department: 'General'
+                });
+            }
+
+            window.location.href = 'student.html';
+        }
+    </script>
 </body>
 </html>
