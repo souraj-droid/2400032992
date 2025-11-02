@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Achievement Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">🏆 Admin Dashboard</div>
+            <div class="nav-links">
+                <span id="adminName">Admin</span>
+                <button class="btn btn-small" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <ul class="menu">
+                <li class="menu-item active" onclick="showSection('overview')">
+                    <span class="menu-icon">📊</span> Overview
+                </li>
+                <li class="menu-item" onclick="showSection('achievements')">
+                    <span class="menu-icon">🏅</span> Achievements
+                </li>
+                <li class="menu-item" onclick="showSection('students')">
+                    <span class="menu-icon">👥</span> Students
+                </li>
+                <li class="menu-item" onclick="showSection('reports')">
+                    <span class="menu-icon">📈</span> Reports
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <!-- Overview Section -->
+            <section id="overview-section" class="content-section active">
+                <h2>Dashboard Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3 id="totalStudents">0</h3>
+                            <p>Total Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-info">
+                            <h3 id="totalAchievements">0</h3>
+                            <p>Total Achievements</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-info">
+                            <h3 id="totalAwards">0</h3>
+                            <p>Awards Given</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3 id="recentActivities">0</h3>
+                            <p>This Month</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-section">
+                    <h3>Recent Achievements</h3>
+                    <div id="recentAchievementsList" class="achievement-list"></div>
+                </div>
+            </section>
+
+            <!-- Achievements Section -->
+            <section id="achievements-section" class="content-section">
+                <div class="section-header">
+                    <h2>Manage Achievements</h2>
+                    <button class="btn btn-primary" onclick="showAddAchievementModal()">+ Add Achievement</button>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="searchAchievement" placeholder="Search achievements..." onkeyup="filterAchievements()">
+                    <select id="categoryFilter" onchange="filterAchievements()">
+                        <option value="">All Categories</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Leadership">Leadership</option>
+                        <option value="Community Service">Community Service</option>
+                        <option value="Academic Competition">Academic Competition</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div id="achievementsList" class="table-container"></div>
+            </section>
+
+            <!-- Students Section -->
+            <section id="students-section" class="content-section">
+                <div class="section-header">
+                    <h2>Manage Students</h2>
+                    <button class="btn btn-primary" onclick="showAddStudentModal()">+ Add Student</button>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="searchStudent" placeholder="Search students..." onkeyup="filterStudents()">
+                </div>
+
+                <div id="studentsList" class="table-container"></div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="content-section">
+                <h2>Generate Reports</h2>
+                <div class="report-options">
+                    <div class="report-card">
+                        <h3>📊 Achievement Summary</h3>
+                        <p>Generate a comprehensive report of all achievements by category</p>
+                        <button class="btn btn-primary" onclick="generateAchievementReport()">Generate Report</button>
+                    </div>
+                    <div class="report-card">
+                        <h3>👥 Student Performance</h3>
+                        <p>View individual student achievement records</p>
+                        <button class="btn btn-primary" onclick="generateStudentReport()">Generate Report</button>
+                    </div>
+                    <div class="report-card">
+                        <h3>📈 Participation Trends</h3>
+                        <p>Analyze participation trends over time</p>
+                        <button class="btn btn-primary" onclick="generateTrendReport()">Generate Report</button>
+                    </div>
+                </div>
+
+                <div id="reportOutput" class="report-output"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Add/Edit Achievement Modal -->
+    <div id="achievementModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="achievementModalTitle">Add Achievement</h2>
+                <span class="close" onclick="closeAchievementModal()">&times;</span>
+            </div>
+            <form id="achievementForm" onsubmit="saveAchievement(event)">
+                <input type="hidden" id="achievementId">
+                <div class="form-group">
+                    <label for="achievementStudent">Student *</label>
+                    <select id="achievementStudent" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="achievementTitle">Achievement Title *</label>
+                    <input type="text" id="achievementTitle" placeholder="e.g., First Place in Basketball Tournament" required>
+                </div>
+                <div class="form-group">
+                    <label for="achievementCategory">Category *</label>
+                    <select id="achievementCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Leadership">Leadership</option>
+                        <option value="Community Service">Community Service</option>
+                        <option value="Academic Competition">Academic Competition</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="achievementType">Type *</label>
+                    <select id="achievementType" required>
+                        <option value="">Select Type</option>
+                        <option value="Award">Award</option>
+                        <option value="Recognition">Recognition</option>
+                        <option value="Participation">Participation</option>
+                        <option value="Certificate">Certificate</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="achievementDate">Date *</label>
+                    <input type="date" id="achievementDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="achievementDescription">Description</label>
+                    <textarea id="achievementDescription" rows="3" placeholder="Describe the achievement..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="achievementLevel">Level</label>
+                    <select id="achievementLevel">
+                        <option value="School">School Level</option>
+                        <option value="District">District Level</option>
+                        <option value="State">State Level</option>
+                        <option value="National">National Level</option>
+                        <option value="International">International Level</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Save Achievement</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAchievementModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Student Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="studentModalTitle">Add Student</h2>
+                <span class="close" onclick="closeStudentModal()">&times;</span>
+            </div>
+            <form id="studentForm" onsubmit="saveStudent(event)">
+                <input type="hidden" id="studentEditId">
+                <div class="form-group">
+                    <label for="studentIdInput">Student ID *</label>
+                    <input type="text" id="studentIdInput" placeholder="e.g., 2400032992" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentNameInput">Full Name *</label>
+                    <input type="text" id="studentNameInput" placeholder="Enter student name" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentEmail">Email</label>
+                    <input type="email" id="studentEmail" placeholder="student@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="studentDepartment">Department</label>
+                    <input type="text" id="studentDepartment" placeholder="e.g., Computer Science">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Save Student</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
